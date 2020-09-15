@@ -27,26 +27,28 @@ class PTH_Toolkit extends Toolkit {
     }
 
     /*
-     * Add SQL support
+     * Add SQL support (straight execute)
      */
-    public function executeSQL($operator, $statement, $parser = null, $options = NULL) {
+    public function executeSQL($statement, $options = [], $sqlOptions = NULL, $results = false) {
+
         $query = new SQLProcessor($this);
 
-        $query->wrapSQL($operator, $statement, $options);
+        $query->wrapSQL($statement, $options, $sqlOptions);
         $query->runQuery();
 
-        if ($parser) {
-            $parsedResult = '';
-
-            switch($parser) {
-                case "json":
-                    $parsedResult = $query->getJson();
+        if ($results) {
+            switch (strtolower($results)) {
+                case 'json':
+                    return $query->getJson();
                     break;
-                default:
-                    $parsedResult = 'No parser';
+                case 'xmlobject':
+                    return $query->getXMLObject();
+                    break;
+                case 'rawoutput':
+                default:       
+                    return $query->getRawOutput();
+                    break;
             }
-
-            return $parsedResult;
         } else {
             return;
         }
@@ -84,30 +86,36 @@ class SQLProcessor {
     /**
      * Wrap the passed sql
      */
-    public function wrapSQL($operator, $statement, $options = null) {
+    public function wrapSQL($statement, $options, $sqlOptions = null) {
+        // Placeholder merge for options
+        $options = array_merge([
+            'fetch'      => false,
+            'journaling' => true
+        ], $options);
+
         $xml = "<sql>";
 
-        if ($options) {
-            $xml .= "<options ";
+        if ($sqlOptions) {
+            $xml .= "<sqlOptions ";
 
-            foreach ($options as $option) {
+            foreach ($sqlOptions as $option) {
                 echo $option . " ";
             }
 
             $xml .= "/>";
         }
 
-        $xml .= "<query>$operator $statement";
+        $xml .= "<query>$statement";
 
         // Disable Commitment control for Insert
-        if (strtolower($operator) === "insert into") {
+        if ($options['journaling'] === false) {
             $xml .= " with NONE";
         }
 
         $xml .= "</query>";
 
         // If we require an output then add a fetch block
-        if (strtolower($operator) === "select") {
+        if ($options['fetch'] === true) {
             $xml .= "<fetch block = 'all' desc = 'on' />";
         }
 
@@ -191,31 +199,4 @@ class SQLProcessor {
 
         return $result;
     }
-}
-
-/**
- * turn IPMF  into associative array
- * @param $cursor
- * @return array
- */
-function IPMFAsObject($cursor){
-    $retArr = [];
-
-    foreach ($cursor->row as $record) {
-        $name = (string) $record->data[0];
-        $value =  (string) $record->data[1];
-        $retArr[$name] = $value;
-    }
-
-    return $retArr;
-}
-
-function debugVar($var) {
-    echo '<p></p>';
-    echo '<p>************************</p>';
-
-    var_dump($var);
-
-    echo '<p>************************</p>';
-    echo '<p></p>';
 }
