@@ -8,21 +8,17 @@ use ToolkitApi\Toolkit;
 use ToolkitApi\XMLWrapper;
 use ToolkitApi\ProgramParameter;
 
-class PTH_ToolkitService extends ToolkitService
-{
-    static function getInstance($databaseNameOrResource = '*LOCAL', $userOrI5NamingFlag = '', $password = '', $transportType = '', $isPersistent = false)
-    {
+class PTH_ToolkitService extends ToolkitService {
+    static function getInstance($databaseNameOrResource = '*LOCAL', $userOrI5NamingFlag = '', $password = '', $transportType = '', $isPersistent = false) {
         return new PTH_Toolkit($databaseNameOrResource, $userOrI5NamingFlag, $password, $transportType, $isPersistent);
     }
 }
 
 class PTH_Toolkit extends Toolkit {
+    public function executeSQL($operator, $statement, $parser = null, $options = NULL) {
+        $query = new SQLProcessor($this);
 
-
-    public function executeSQL($type, $statement, $parser = null, $options = NULL) {
-        $query = new SQLProcessor($this, $type);
-
-        $query->wrapSQL($statement, $options);
+        $query->wrapSQL($operator, $statement, $options);
         $query->runQuery();
 
         if ($parser) {
@@ -43,26 +39,22 @@ class PTH_Toolkit extends Toolkit {
     }
 }
 
-
 class SQLProcessor {
-    protected $ToolkitServiceObj ;
-    protected String $rawOutput;
-    protected XMLWrapper $xml;
-
-    private String $type;
+    protected $ToolkitServiceObj = null;
+    protected $rawOutput = null;
+    protected $xml = null;
 
     /*
      * @TODO Error logging
      */
-    public function __construct($ToolkitServiceObj, $type) {
+    public function __construct($ToolkitServiceObj) {
         $this->ToolkitServiceObj = $ToolkitServiceObj;
-        $this->type = $type;
     }
 
     /**
      * Wrap the passed sql
      */
-    public function wrapSQL($statement, $options = null) {
+    public function wrapSQL($operator, $statement, $options = null) {
         $xml = "<sql>";
 
         if ($options) {
@@ -75,17 +67,17 @@ class SQLProcessor {
             $xml .= "/>";
         }
 
-        $xml .= "<query>$statement";
+        $xml .= "<query>$operator $statement";
 
         // Disable Commitment control for Insert
-        if ($this.type === SqlType::insert) {
+        if (strtolower($operator) === "insert into") {
             $xml .= " with NONE";
         }
 
         $xml .= "</query>";
 
         // If we require an output then add a fetch block
-        if ($this.type === SqlType::select) {
+        if (strtolower($operator) === "select") {
             $xml .= "<fetch block = 'all' desc = 'on' />";
         }
 
@@ -196,11 +188,4 @@ function debugVar($var) {
 
     echo '<p>************************</p>';
     echo '<p></p>';
-}
-
-
-abstract class  SqlType {
-    const update ="update";
-    const insert = "insert";
-    const select = "select";
 }
