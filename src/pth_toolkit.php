@@ -15,6 +15,20 @@ class PTH_ToolkitService extends ToolkitService {
 }
 
 class PTH_Toolkit extends Toolkit {
+
+    public function __construct($databaseNameOrResource, $userOrI5NamingFlag = '0', $password = '', $transportType = '', $isPersistent = false) {
+
+        // Check for PDO connection
+        if (strtolower($transportType) === 'pdo') {
+            $dbconn = $this->pdoConn($databaseNameOrResource, $userOrI5NamingFlag[0], $password, $userOrI5NamingFlag[1]);
+        }
+
+        parent::__construct($dbconn, $userOrI5NamingFlag[1], $password, $transportType, $isPersistent);
+    }
+
+    /*
+     * Add SQL support
+     */
     public function executeSQL($operator, $statement, $parser = null, $options = NULL) {
         $query = new SQLProcessor($this);
 
@@ -36,6 +50,22 @@ class PTH_Toolkit extends Toolkit {
         } else {
             return;
         }
+    }
+
+    /*
+     * Add PDO Connection
+     */
+    private function pdoConn($databaseName, $user, $pass, $namingMode = 1, $persistence = false) {
+        try {
+            $dbconn = new PDO("odbc:DSN=$databaseName;NAM=$namingMode", $user, $pass, array(
+                PDO::ATTR_PERSISTENT => $persistence,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING,
+            ));
+        } catch (PDOException $e) {
+            die ('PDO connection failed: ' . $e->getMessage());
+        }
+
+        return $dbconn;
     }
 }
 
