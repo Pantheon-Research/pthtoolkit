@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="752f5bfc-d55f-42ed-ae21-552437575fb2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/pth_toolkit.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/pth_toolkit.php" afterDir="false" />
-    </list>
+    <list default="true" id="752f5bfc-d55f-42ed-ae21-552437575fb2" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -91,7 +89,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600246383079</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Overloading makeDBCall to fix disconnect errors">
+      <created>1600264998935</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1600264998935</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -104,14 +109,15 @@
     <MESSAGE value="Setting up tests&#10;Adding components&#10;Changing toolkit structure" />
     <MESSAGE value="Correcting table typo" />
     <MESSAGE value="Adding relative pathing for connection files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding relative pathing for connection files" />
+    <MESSAGE value="Overloading makeDBCall to fix disconnect errors" />
+    <option name="LAST_COMMIT_MESSAGE" value="Overloading makeDBCall to fix disconnect errors" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="1960" y="-1080" key="CommitChangelistDialog2" timestamp="1600246382553">
+    <state x="2395" y="-993" key="CommitChangelistDialog2" timestamp="1600264998371">
       <screen x="1469" y="-1080" width="1920" height="1080" />
     </state>
     <state x="393" y="0" key="CommitChangelistDialog2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600244079872" />
-    <state x="1960" y="-1080" key="CommitChangelistDialog2/0.0.1536.824/1469.-1080.1920.1080@1469.-1080.1920.1080" timestamp="1600246382553" />
+    <state x="2395" y="-993" key="CommitChangelistDialog2/0.0.1536.824/1469.-1080.1920.1080@1469.-1080.1920.1080" timestamp="1600264998371" />
     <state x="646" y="310" key="Github.ShareDialog" timestamp="1600169547564">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
