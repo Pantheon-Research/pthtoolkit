@@ -69,6 +69,23 @@ class PTH_Toolkit extends Toolkit {
 
         return $dbconn;
     }
+
+    /**
+     * Same as disconnect but also really close persistent database connection.
+     * @GSC this is going to the db2 functions resulting in an error for pdo
+     */
+    public function disconnectPersistent() {
+        if (isset($this->db) && $this->db && $this->getOption('transportType') === 'ibm_db2') {
+            $this->PgmCall("OFF", NULL);
+            $this->db->disconnectPersistent($this->conn);
+
+            $this->conn = null;
+        } else {
+            echo 'not db2';
+
+            $this->disconnect();
+        }
+    }
 }
 
 class SQLProcessor {
