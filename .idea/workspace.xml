@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="752f5bfc-d55f-42ed-ae21-552437575fb2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/components/connection.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/sqlIPMF.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/sqlIPMF.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +41,8 @@
       <option name="presentableId" value="Default" />
       <updated>1600169492208</updated>
       <workItem from="1600169494146" duration="5918000" />
+      <workItem from="1600197685552" duration="163000" />
+      <workItem from="1600240161177" duration="1784000" />
     </task>
     <task id="LOCAL-00001" summary="Correcting initial commit">
       <created>1600172319723</created>
@@ -56,7 +58,21 @@
       <option name="project" value="LOCAL" />
       <updated>1600174169405</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Setting up tests&#10;Changing toolkit structure">
+      <created>1600197724280</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1600197724280</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Setting up tests&#10;Adding components&#10;Changing toolkit structure">
+      <created>1600197825501</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1600197825501</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -65,13 +81,15 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Correcting initial commit" />
     <MESSAGE value="Setting up folder structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="Setting up folder structure" />
+    <MESSAGE value="Setting up tests&#10;Changing toolkit structure" />
+    <MESSAGE value="Setting up tests&#10;Adding components&#10;Changing toolkit structure" />
+    <option name="LAST_COMMIT_MESSAGE" value="Setting up tests&#10;Adding components&#10;Changing toolkit structure" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="393" y="0" key="CommitChangelistDialog2" timestamp="1600174168766">
+    <state x="393" y="0" key="CommitChangelistDialog2" timestamp="1600197824921">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="393" y="0" key="CommitChangelistDialog2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600174168766" />
+    <state x="393" y="0" key="CommitChangelistDialog2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600197824921" />
     <state x="646" y="310" key="Github.ShareDialog" timestamp="1600169547564">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -88,9 +106,9 @@
       <screen x="1469" y="-1080" width="1920" height="1080" />
     </state>
     <state x="2263" y="-617" key="NewPhpFileDialog/0.0.1536.824/1469.-1080.1920.1080@1469.-1080.1920.1080" timestamp="1600174427616" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1600174197894">
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1600197831725">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600174197894" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600197831725" />
   </component>
 </project>

@@ -31,7 +31,7 @@ for ($i = 0; $i < $loopNr ; $i++) {
     }
 
     // Drop the table for next loop
-    $ToolkitServiceObj->executeSQL("DROP table QTEMP.peetable");
+    $ToolkitServiceObj->executeSQL("DROP table QTEMP.IPMF");
 
     // If !persistence test then disconnect
     if (!$persistence) {
