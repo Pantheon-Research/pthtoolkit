@@ -58,8 +58,14 @@ class PTH_Toolkit extends Toolkit {
      * Add PDO Connection
      */
     private function pdoConn($databaseName, $user, $pass, $namingMode = 1, $persistence = false) {
+        if (PHP_OS == "OS400") {
+            $constr = "odbc:DSN=$databaseName;NAM=$namingMode";
+        } else {
+            $constr = "odbc:Driver={iSeries Access ODBC Driver};System=pths02;NAM=$namingMode";
+        }
+        
         try {
-            $dbconn = new PDO("odbc:DSN=$databaseName;NAM=$namingMode", $user, $pass, array(
+            $dbconn = new PDO($constr, $user, $pass, array(
                 PDO::ATTR_PERSISTENT => $persistence,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING,
             ));
