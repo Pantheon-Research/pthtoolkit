@@ -70,7 +70,9 @@ class PTH_Toolkit extends Toolkit {
         return $dbconn;
     }
 
-    // @GSC Overloading the makeDBCall to fix disconnect errors
+    /*
+     * @GSC Overloading the makeDBCall to fix disconnect errors
+     */
     protected function makeDbCall($internalKey, $plugSize, $controlKeyString, $inputXml, $disconnect = false) {
         $toolkitLib = $this->getOption('XMLServiceLib');
         $schemaSep = $this->getOption('schemaSep');
