@@ -1,6 +1,6 @@
 <?php
 
-require '/pfmphp/notkotlin/pth_toolkit/src/pth_toolkit.php';
+require dirname(__FILE__) . '/../../src/pth_toolkit.php';
 
 function getConnection($persistence = false, $flag = null) {
     $db = '*LOCAL';

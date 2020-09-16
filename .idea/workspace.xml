@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="752f5bfc-d55f-42ed-ae21-552437575fb2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/sqlIPMF.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/sqlIPMF.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/components/connection.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/components/connection.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +25,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.deploy.options" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
@@ -42,7 +43,7 @@
       <updated>1600169492208</updated>
       <workItem from="1600169494146" duration="5918000" />
       <workItem from="1600197685552" duration="163000" />
-      <workItem from="1600240161177" duration="1784000" />
+      <workItem from="1600240161177" duration="3799000" />
     </task>
     <task id="LOCAL-00001" summary="Correcting initial commit">
       <created>1600172319723</created>
@@ -72,7 +73,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600197825501</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Correcting table typo">
+      <created>1600244080525</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1600244080525</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -83,13 +91,14 @@
     <MESSAGE value="Setting up folder structure" />
     <MESSAGE value="Setting up tests&#10;Changing toolkit structure" />
     <MESSAGE value="Setting up tests&#10;Adding components&#10;Changing toolkit structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="Setting up tests&#10;Adding components&#10;Changing toolkit structure" />
+    <MESSAGE value="Correcting table typo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correcting table typo" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="393" y="0" key="CommitChangelistDialog2" timestamp="1600197824921">
+    <state x="393" y="0" key="CommitChangelistDialog2" timestamp="1600244079872">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="393" y="0" key="CommitChangelistDialog2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600197824921" />
+    <state x="393" y="0" key="CommitChangelistDialog2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600244079872" />
     <state x="646" y="310" key="Github.ShareDialog" timestamp="1600169547564">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -106,9 +115,13 @@
       <screen x="1469" y="-1080" width="1920" height="1080" />
     </state>
     <state x="2263" y="-617" key="NewPhpFileDialog/0.0.1536.824/1469.-1080.1920.1080@1469.-1080.1920.1080" timestamp="1600174427616" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1600197831725">
+    <state x="277" y="57" key="SettingsEditor" timestamp="1600245352604">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600197831725" />
+    <state x="277" y="57" key="SettingsEditor/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600245352604" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1600244094306">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824/1469.-1080.1920.1080@0.0.1536.824" timestamp="1600244094306" />
   </component>
 </project>
