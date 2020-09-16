@@ -70,21 +70,65 @@ class PTH_Toolkit extends Toolkit {
         return $dbconn;
     }
 
-    /**
-     * Same as disconnect but also really close persistent database connection.
-     * @GSC this is going to the db2 functions resulting in an error for pdo
-     */
-    public function disconnectPersistent() {
-        if (isset($this->db) && $this->db && $this->getOption('transportType') === 'ibm_db2') {
-            $this->PgmCall("OFF", NULL);
-            $this->db->disconnectPersistent($this->conn);
+    // @GSC Overloading the makeDBCall to fix disconnect errors
+    protected function makeDbCall($internalKey, $plugSize, $controlKeyString, $inputXml, $disconnect = false) {
+        $toolkitLib = $this->getOption('XMLServiceLib');
+        $schemaSep = $this->getOption('schemaSep');
+        $transportType = $this->getOption('transportType');
 
-            $this->conn = null;
-        } else {
-            echo 'not db2';
+        $plugPrefix =  $this->getOption('plugPrefix');
+        // construct plug name from prefix + size
+        $plug = $plugPrefix . $plugSize; // e.g. iPLUG512K
 
-            $this->disconnect();
+        if ($plugPrefix == 'iPLUG') {
+            // db2 driver stored procedures take 4 params
+            $sql =  "call {$toolkitLib}{$schemaSep}{$plug}(?,?,?,?)";
+        } else {    /*odbc, iPLUGR */
+            // only three params for odbc stored procedures
+            $sql =  "call {$toolkitLib}{$schemaSep}{$plug}(?,?,?)";
         }
+
+        $bindArray = array(
+            'internalKey' => $internalKey,
+            'controlKey' => $controlKeyString,
+            'inputXml' => $inputXml,
+            'outputXml' => '',
+            'disconnect' => $disconnect
+        );
+
+        // if debug mode, log control key, stored procedure statement, and input XML.
+        if ($this->isDebug()) {
+            $this->debugLog("\nExec start: " . date("Y-m-d H:i:s") . "\nVersion of toolkit front end: " . self::getFrontEndVersion() ."\nIPC: '" . $this->getInternalKey() . "'. Control key: $controlKeyString\nStmt: $sql with transport: $transportType\nInput XML: $inputXml\n");
+            $this->execStartTime = microtime(true);
+        }
+
+        // can return false if prepare or exec failed.
+        $outputXml = $this->db->execXMLStoredProcedure($this->conn, $sql, $bindArray);
+
+        if (!$outputXml && !$disconnect) {
+            // if false returned, was a database error (stored proc prepare or execute error)
+            // @todo add ODBC SQL State codes
+
+            // If can't find stored proc for ODBC: Database code (if any): S1000. Message: [unixODBC][IBM][System i Access ODBC Driver][DB2 for i5/OS]SQL0440 - Routine IPLUG512K in XMLSERVICE not found with specified parameters.
+            //Warning: odbc_prepare(): SQL error: [unixODBC][IBM][System i Access ODBC Driver][DB2 for i5/OS]SQL0440 - Routine IPLUG512K in XMLSERVICE not found with specified parameters., SQL state S1000 in SQLPrepare in /usr/local/zend/ToolkitAPI/Odbcsupp.php on line 89
+            $this->cpfErr = $this->db->getErrorCode();
+            $this->setErrorMsg($this->db->getErrorMsg());
+
+            $errorReason = $this->getErrorReason($plugSize);
+
+            logThis($errorReason);
+            die($errorReason);
+        }
+
+        if ($disconnect) {
+            $this->db->disconnect($this->conn);
+
+            if ($this->isDebug()) {
+                $this->debugLog("Db disconnect requested and done.\n");
+            } //(debug)
+        }
+
+        return $outputXml;
     }
 }
 
