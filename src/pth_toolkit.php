@@ -1,6 +1,10 @@
 <?php
 
-$toolkitDir = 'ToolkitApi/';
+if (PHP_OS == "OS400") {
+    $toolkitDir = 'ToolkitApi/';
+} else {
+    $toolkitDir = dirname(__FILE__) . '/../../vendor/zendtech/ibmitoolkit/ToolkitApi/';
+}
 
 require $toolkitDir . 'ToolkitService.php';
 
