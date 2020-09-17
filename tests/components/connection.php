@@ -20,7 +20,7 @@ function getConnection($persistence = false, $flag = null) {
     $ToolkitServiceObj->setToolkitServiceParams(array(
         'InternalKey' => $InternalKey,
         'debug' => true,
-        'debugLogFile' => "/pfmphp/notkotlin/log/tkit_debug.log"
+        'debugLogFile' => dirname(__FILE__) . '/../../../log/tkit_debug.log'
     ));
 
     return $ToolkitServiceObj;
