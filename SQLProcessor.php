@@ -99,7 +99,9 @@ class SQLProcessor
         $result = $this->getXMLObject();
         $json = $this->jsonParser($result);
 
-        return json_encode($json);
+        // @GSC removed the JSON encode for Laravel compatibility
+
+        return $json;
     }
 
     /**
