@@ -66,8 +66,10 @@ class PTHToolkit extends Toolkit
     {
         if (PHP_OS == "OS400") {
             $constr = "odbc:DSN=$databaseName;NAM=$namingMode";
+        } elseif (PHP_OS == "Linux") {
+            $constr = "odbc:DSN=PTHSDNS;CMT=2";
         } else {
-            $constr = "odbc:Driver={iSeries Access ODBC Driver};System=pths02;NAM=$namingMode";
+            $constr = "odbc:Driver={iSeries Access odbc Driver};System=pths02;NAM=$namingMode";
         }
 
         try {
