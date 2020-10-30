@@ -1,0 +1,12 @@
+{
+  "name": "pantheon-research/pthtoolkit",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/zendtech/IbmiToolkit.git"
+    }
+  ],
+  "require": {
+    "zendtech/ibmitoolkit": "dev-master"
+  }
+}

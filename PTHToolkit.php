@@ -2,7 +2,7 @@
 
 namespace PTHToolkit;
 
-require_once 'ToolkitApi/Toolkit.php';
+require_once 'vendor/autoload.php';
 require_once 'SQLProcessor.php';
 
 use ToolkitApi\Toolkit;
