@@ -2,7 +2,8 @@
 
 namespace PTHToolkit;
 
-require_once 'vendor/autoload.php';
+// Don't forget to include the autoload.php in your project!
+//require_once 'vendor/autoload.php';
 require_once 'SQLProcessor.php';
 
 use ToolkitApi\Toolkit;
