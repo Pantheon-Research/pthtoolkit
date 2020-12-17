@@ -138,39 +138,11 @@ class PTHToolkit extends Toolkit
     }
 
 
-    public function appendCallXML($inputXml, $disconnect=false){
-        $this->fullXML .= $inputXml;
-        $this->disconnect = $disconnect;
-    }
-
-    public function sendFullXML($results = false){
-        $this->fullXML .= "</script>";
-        $rawOutput = $this->sendXml($this->fullXML, null);
-        if ($results) {
-            switch (strtolower($results)) {
-                case 'json':
-                    return $this->query->getJson($rawOutput);
-                    break;
-                case 'xmlobject':
-                    return $this->query->getXMLObject($rawOutput);
-                    break;
-                case 'rawoutput':
-                default:
-                    return $this->query->getRawOutput($rawOutput);
-                    break;
-            }
-        } else {
-            return [];
-        }
-    }
-
-
     /**
-     * CLCommandPTH
-     *
-     * @param array $command string will be turned into an array
-     * @param string $exec could be 'pase', 'pasecmd', 'system,' 'rexx', or 'cmd'
-     * @return array|bool
+     * @param array $command
+     * @param string $exec
+     * @return array|bool|void
+     * @throws \Exception
      */
     public function CLCommand($command, $exec = '')
     {
@@ -207,7 +179,8 @@ class PTHToolkit extends Toolkit
      * @param null $inputParam An array of ProgramParameter objects OR XML representing params, to be sent as-is.
      * @param null $returnParam ReturnValue Array of one parameter that's the return value parameter
      * @param null $options Array of other options. The most popular is 'func' indicating the name of a subprocedure or function.
-     * @return array|bool
+     * @return void
+     * @throws \Exception
      */
     public function pgmCall($pgmName, $lib, $inputParam = NULL, $returnParam = NULL, $options = NULL)
     {
@@ -240,7 +213,41 @@ class PTHToolkit extends Toolkit
         //append xml
         $this->appendCallXML($inputXml, false);
 
+        unset ($this->XMLWrapper);
     }
 
+    /**
+     * @param $inputXml
+     * @param false $disconnect
+     */
+    public function appendCallXML($inputXml, $disconnect=false){
+        $this->fullXML .= $inputXml;
+        $this->disconnect = $disconnect;
+    }
+
+    /**
+     * @param false $results
+     * @return array
+     */
+    public function sendFullXML($results = false){
+        $this->fullXML .= "</script>";
+        $rawOutput = $this->sendXml($this->fullXML, null);
+        if ($results) {
+            switch (strtolower($results)) {
+                case 'json':
+                    return $this->query->getJson($rawOutput);
+                    break;
+                case 'xmlobject':
+                    return $this->query->getXMLObject($rawOutput);
+                    break;
+                case 'rawoutput':
+                default:
+                    return $this->query->getRawOutput($rawOutput);
+                    break;
+            }
+        } else {
+            return [];
+        }
+    }
 
 }
