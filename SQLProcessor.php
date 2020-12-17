@@ -83,9 +83,10 @@ class SQLProcessor
         return $this->rawOutput;
     }
 
+
     /**
-     * Parse response XML to object
-     * @return obj
+     * @param $rawOutput
+     * @return \SimpleXMLElement
      */
     public function getXMLObject($rawOutput)
     {
@@ -95,7 +96,7 @@ class SQLProcessor
 
     /**
      * Parse response XML to JSON
-     * @return string
+     * @return array
      */
     public function getJson($rawOutput)
     {
@@ -109,7 +110,7 @@ class SQLProcessor
 
     /**
      * Parse object to Json
-     * @return string
+     * @return array
      */
     private function jsonParser($obj)
     {
