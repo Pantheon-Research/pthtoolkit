@@ -6,15 +6,17 @@ namespace PTHToolkit;
 //require_once 'vendor/autoload.php';
 require_once 'SQLProcessor.php';
 
+use PTHToolkit\PTHToolkitServiceXML;
+use ToolkitApi\ProgramParameter;
 use ToolkitApi\Toolkit;
 use PTHToolkit\SQLProcessor;
 use PDO;
-use PTHToolkit\PTHToolkitServiceXML;
 
 class PTHToolkit extends Toolkit
 {
-    protected $fullXML = null;
+    protected $fullXML = "<script>";
     protected $disconnect = null;
+    protected $query = null;
 
     public function __construct($databaseNameOrResource = false, $userOrI5NamingFlag = false, $password = false, $transportType = false, $isPersistent = false)
     {
@@ -39,27 +41,11 @@ class PTHToolkit extends Toolkit
     public function executeSQL($statement, $options = [], $sqlOptions = NULL, $results = false)
     {
 
-        $query = new SQLProcessor($this);
+        $this->query = new SQLProcessor($this);
 
-        $query->wrapSQL($statement, $options, $sqlOptions);
-        $query->runQuery();
+        $this->query->wrapSQL($statement, $options, $sqlOptions);
+        $this->query->runQuery();
 
-//        if ($results) {
-//            switch (strtolower($results)) {
-//                case 'json':
-//                    return $query->getJson();
-//                    break;
-//                case 'xmlobject':
-//                    return $query->getXMLObject();
-//                    break;
-//                case 'rawoutput':
-//                default:
-//                    return $query->getRawOutput();
-//                    break;
-//            }
-//        } else {
-//            return;
-//        }
     }
 
     /*
@@ -158,39 +144,35 @@ class PTHToolkit extends Toolkit
     }
 
     public function sendFullXML($results = false){
-        $this->rawOutput = $this->sendXml($this->fullXML, null);
-
-        var_dump($this->fullXML);
-
-        $query = new SQLProcessor($this);
+        $this->fullXML .= "</script>";
+        $rawOutput = $this->sendXml($this->fullXML, null);
         if ($results) {
             switch (strtolower($results)) {
                 case 'json':
-                    return $query->getJson();
+                    return $this->query->getJson($rawOutput);
                     break;
                 case 'xmlobject':
-                    return $query->getXMLObject();
+                    return $this->query->getXMLObject($rawOutput);
                     break;
                 case 'rawoutput':
                 default:
-                    return $query->getRawOutput();
+                    return $this->query->getRawOutput($rawOutput);
                     break;
             }
         } else {
-            return;
+            return [];
         }
     }
 
 
-
     /**
-     * CLCommand
+     * CLCommandPTH
      *
      * @param array $command string will be turned into an array
      * @param string $exec could be 'pase', 'pasecmd', 'system,' 'rexx', or 'cmd'
      * @return array|bool
      */
-    public function CLCommandPTH($command, $exec = '')
+    public function CLCommand($command, $exec = '')
     {
         $this->XMLWrapperPTH = new PTHToolkitServiceXML(array('encoding' => $this->getOption('encoding')), $this);
 
@@ -212,33 +194,52 @@ class PTHToolkit extends Toolkit
 
         $this->VerifyPLUGName();
 
-        // send the XML, running the command
-        //$outputXml = $this->sendXml($inputXml, false);
+        //append xml
         $this->appendCallXML($inputXml, false);
 
-//        // get status: error or success, with a real CPF error message, and set the error code/msg.
-//        $successFlag = $this->XMLWrapperPTH->getCmdResultFromXml($outputXml, $parentTag);
-//
-//        if ($successFlag) {
-//            $this->cpfErr = '0';
-//            $this->error = '';
-//        } else {
-//            $this->cpfErr = $this->XMLWrapperPTH->getErrorCode();
-//            $this->error = $this->cpfErr; // ->error is ambiguous. Include for backward compat.
-//            $this->errorText = $this->XMLWrapperPTH->getErrorMsg();
-//        }
-//
-//        if ($successFlag && $expectDataOutput) {
-//            // if we expect to receive data, extract it from the XML and return it.
-//            $outputParamArray = $this->XMLWrapperPTH->getRowsFromXml($outputXml, $parentTag);
-//
-//            unset($this->XMLWrapperPTH);
-//            return $outputParamArray;
-//        } else {
-//            // don't expect data. Return true/false (success);
-//            unset($this->XMLWrapperPTH);
-//            return $successFlag;
-//        }
+    }
+
+    /**
+     * pgmCall
+     *
+     * @param string $pgmName Name of program to call, without library
+     * @param string $lib Library of program. Leave blank to use library list or current library
+     * @param null $inputParam An array of ProgramParameter objects OR XML representing params, to be sent as-is.
+     * @param null $returnParam ReturnValue Array of one parameter that's the return value parameter
+     * @param null $options Array of other options. The most popular is 'func' indicating the name of a subprocedure or function.
+     * @return array|bool
+     */
+    public function pgmCall($pgmName, $lib, $inputParam = NULL, $returnParam = NULL, $options = NULL)
+    {
+        $this->cpfErr = '';
+        $this->error = '';
+        $this->joblog = '';
+        $function = NULL;
+
+        ProgramParameter::initializeFallbackVarName();
+
+        // If only one 'return' param, turn it into an array for later processing.
+        if ($returnParam instanceof ProgramParameter) {
+            $returnParam = array($returnParam);
+        }
+
+        $this->XMLWrapperPTH = new PTHToolkitServiceXML(array('encoding' => $this->getOption('encoding')), $this);
+
+        // $optional handles special requests such as 'license'
+        $disconnect = (strcmp($pgmName, "OFF") === 0) ? true : false;
+        $optional = (strcmp($pgmName, "NONE") === 0) ? true : false;
+
+        $outputParamArray = false;
+
+        if (isset($options['func'])) {
+            $function = $options['func'];
+        }
+
+        $inputXml = $this->XMLWrapperPTH->buildXmlIn($inputParam, $returnParam, $pgmName, $lib, $function);
+
+        //append xml
+        $this->appendCallXML($inputXml, false);
+
     }
 
 
