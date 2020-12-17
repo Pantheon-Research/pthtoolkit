@@ -5,7 +5,7 @@ namespace PTHToolkit;
 class SQLProcessor
 {
     protected $ToolkitServiceObj = null;
-    protected $rawOutput = null;
+    //protected $rawOutput = null;
     protected $xml = null;
 
     /*
@@ -77,8 +77,9 @@ class SQLProcessor
      * Get raw xml string output from processed query
      * @return string
      */
-    public function getRawOutput()
+    public function getRawOutput($rawOutput)
     {
+        $this->rawOutput = $rawOutput;
         return $this->rawOutput;
     }
 
@@ -86,8 +87,9 @@ class SQLProcessor
      * Parse response XML to object
      * @return obj
      */
-    public function getXMLObject()
+    public function getXMLObject($rawOutput)
     {
+        $this->rawOutput = $rawOutput;
         return simplexml_load_string($this->rawOutput);
     }
 
@@ -95,10 +97,10 @@ class SQLProcessor
      * Parse response XML to JSON
      * @return string
      */
-    public function getJson()
+    public function getJson($rawOutput)
     {
-        $result = $this->getXMLObject();
-        $json = $this->jsonParser($result);
+        $result = $this->getXMLObject($rawOutput);
+        $json = $this->jsonParser($result->sql);
 
         // @GSC removed the JSON encode for Laravel compatibility
 
