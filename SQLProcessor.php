@@ -66,7 +66,8 @@ class SQLProcessor
     {
         if ($this->xml) {
             // send XML to XMLSERVICE
-            $this->rawOutput = $this->ToolkitServiceObj->sendXml($this->xml, null);
+            //$this->rawOutput = $this->ToolkitServiceObj->sendXml($this->xml, null);
+            $this->ToolkitServiceObj->appendCallXML($this->xml, null);
         } else {
             $this->rawOutput = "Error";
         }
