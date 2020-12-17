@@ -1,6 +1,8 @@
 <?php
 namespace PTHToolkit;
 
+use ToolkitApi\ProgramParameter;
+
 class PTHToolkitServiceXML
 {
     protected $encoding ='';
