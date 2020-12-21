@@ -3,6 +3,9 @@ namespace PTHToolkit;
 
 use ToolkitApi\ProgramParameter;
 
+/*
+* @MSI Overloading addOuterTags to disbale adding script tags to every call and to enable a single XML call
+*/
 class PTHToolkitServiceXML
 {
     protected $encoding ='';
