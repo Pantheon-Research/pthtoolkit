@@ -38,13 +38,13 @@ class PTHToolkit extends Toolkit
     /*
      * Add SQL support (straight execute)
      */
-    public function executeSQL($statement, $options = [], $sqlOptions = NULL, $results = false)
+    public function executeSQL($statement, $options = [], $sqlOptions = NULL, $original = false)
     {
 
         $this->query = new SQLProcessor($this);
 
         $this->query->wrapSQL($statement, $options, $sqlOptions);
-        $this->query->runQuery();
+        $this->query->runQuery($original);
 
     }
 
@@ -138,13 +138,17 @@ class PTHToolkit extends Toolkit
     }
 
 
+    /*
+    * @MSI Overloading CLCommand to enable a single XML call
+    */
     /**
      * @param array $command
      * @param string $exec
+     * @param bool $original
      * @return array|bool|void
      * @throws \Exception
      */
-    public function CLCommand($command, $exec = '')
+    public function CLCommand($command, $exec = '', $original = false)
     {
         $this->XMLWrapperPTH = new PTHToolkitServiceXML(array('encoding' => $this->getOption('encoding')), $this);
 
@@ -166,11 +170,44 @@ class PTHToolkit extends Toolkit
 
         $this->VerifyPLUGName();
 
-        //append xml
-        $this->appendCallXML($inputXml, false);
+        if ($original == false){
+            //append xml
+            $this->appendCallXML($inputXml, false);
+        }else{
+            $this->appendCallXML($inputXml, false);
+            $this->fullXML .= "</script>";
+            // send single xml (original toolkit)
+            $outputXml = $this->sendXml($this->fullXML, false);
 
+            // get status: error or success, with a real CPF error message, and set the error code/msg.
+            $successFlag = $this->XMLWrapper->getCmdResultFromXml($outputXml, $parentTag);
+
+            if ($successFlag) {
+                $this->cpfErr = '0';
+                $this->error = '';
+            } else {
+                $this->cpfErr = $this->XMLWrapper->getErrorCode();
+                $this->error = $this->cpfErr; // ->error is ambiguous. Include for backward compat.
+                $this->errorText = $this->XMLWrapper->getErrorMsg();
+            }
+
+            if ($successFlag && $expectDataOutput) {
+                // if we expect to receive data, extract it from the XML and return it.
+                $outputParamArray = $this->XMLWrapper->getRowsFromXml($outputXml, $parentTag);
+
+                unset($this->XMLWrapper);
+                return $outputParamArray;
+            } else {
+                // don't expect data. Return true/false (success);
+                unset($this->XMLWrapper);
+                return $successFlag;
+            }
+        }
     }
 
+    /*
+    * @MSI Overloading pgmCall to enable a single XML call
+    */
     /**
      * pgmCall
      *
@@ -179,10 +216,11 @@ class PTHToolkit extends Toolkit
      * @param null $inputParam An array of ProgramParameter objects OR XML representing params, to be sent as-is.
      * @param null $returnParam ReturnValue Array of one parameter that's the return value parameter
      * @param null $options Array of other options. The most popular is 'func' indicating the name of a subprocedure or function.
+     * @param bool $original
      * @return void
      * @throws \Exception
      */
-    public function pgmCall($pgmName, $lib, $inputParam = NULL, $returnParam = NULL, $options = NULL)
+    public function pgmCall($pgmName, $lib, $inputParam = NULL, $returnParam = NULL, $options = NULL, $original = false)
     {
         $this->cpfErr = '';
         $this->error = '';
@@ -198,10 +236,6 @@ class PTHToolkit extends Toolkit
 
         $this->XMLWrapperPTH = new PTHToolkitServiceXML(array('encoding' => $this->getOption('encoding')), $this);
 
-        // $optional handles special requests such as 'license'
-        $disconnect = (strcmp($pgmName, "OFF") === 0) ? true : false;
-        $optional = (strcmp($pgmName, "NONE") === 0) ? true : false;
-
         $outputParamArray = false;
 
         if (isset($options['func'])) {
@@ -210,9 +244,38 @@ class PTHToolkit extends Toolkit
 
         $inputXml = $this->XMLWrapperPTH->buildXmlIn($inputParam, $returnParam, $pgmName, $lib, $function);
 
-        //append xml
-        $this->appendCallXML($inputXml, false);
+        if ($original == false){
+            //append xml
+            $this->appendCallXML($inputXml, false);
+        }else{
+            $this->appendCallXML($inputXml, false);
+            $this->fullXML .= "</script>";
+            // send single xml (original toolkit)
+            $outputXml = $this->sendXml($this->fullXML, false);
 
+            if ($outputXml != '') {
+
+                $outputParamArray = $this->XMLWrapper->getParamsFromXml($outputXml);
+
+                // didn't get expected return, search logs to find out why
+                if (!is_array($outputParamArray)) {
+                    // No real data. Look for errors. Retrieve details from joblog.
+                    $this->joblog = $this->XMLWrapper->getLastJoblog();
+
+                    // standard list of programs that provide CPF codes in joblog
+                    $programsToLookFor = array($pgmName, '< lveContext', '#mnrnrl', 'QRNXIE', '< allProgram');
+
+                    if (isset($this->_cpfMapping[$pgmName])) {
+                        // list of other programs not called directly that might generate CPF codes in joblog.
+                        $programsToLookFor = array_merge($programsToLookFor, $this->_cpfMapping[$pgmName]);
+                    }
+
+                    // put values in $this->cpfErr and $this->error
+                    $this->extractErrorFromJoblog($programsToLookFor);
+                }
+            }
+            return $outputParamArray;
+        }
         unset ($this->XMLWrapper);
     }
 
