@@ -61,13 +61,17 @@ class SQLProcessor
 
     /**
      * Run query from wrapped sql
+     * @param bool $original
      */
-    public function runQuery()
+    public function runQuery($original = false)
     {
         if ($this->xml) {
             // send XML to XMLSERVICE
-            //$this->rawOutput = $this->ToolkitServiceObj->sendXml($this->xml, null);
-            $this->ToolkitServiceObj->appendCallXML($this->xml, null);
+            if ($original == false){
+                $this->ToolkitServiceObj->appendCallXML($this->xml, null);
+            } else {
+                $this->rawOutput = $this->ToolkitServiceObj->sendXml($this->xml, null);
+            }
         } else {
             $this->rawOutput = "Error";
         }
@@ -102,7 +106,7 @@ class SQLProcessor
     {
         $result = $this->getXMLObject($rawOutput);
         $json = $this->jsonParser($result->sql);
-
+        //todo prepare for multiple sql fetches
         // @GSC removed the JSON encode for Laravel compatibility
 
         return $json;
