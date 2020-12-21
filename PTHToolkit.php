@@ -6,16 +6,20 @@ namespace PTHToolkit;
 //require_once 'vendor/autoload.php';
 require_once 'SQLProcessor.php';
 
+use PTHToolkit\PTHToolkitServiceXML;
+use ToolkitApi\ProgramParameter;
 use ToolkitApi\Toolkit;
-use PTHToolkit\SQLProcesor;
+use PTHToolkit\SQLProcessor;
 use PDO;
 
 class PTHToolkit extends Toolkit
 {
+    protected $fullXML = "<script>";
+    protected $disconnect = null;
+    protected $query = null;
 
     public function __construct($databaseNameOrResource = false, $userOrI5NamingFlag = false, $password = false, $transportType = false, $isPersistent = false)
     {
-        // @GSC Empty
     }
 
     /*
@@ -34,30 +38,14 @@ class PTHToolkit extends Toolkit
     /*
      * Add SQL support (straight execute)
      */
-    public function executeSQL($statement, $options = [], $sqlOptions = NULL, $results = false)
+    public function executeSQL($statement, $options = [], $sqlOptions = NULL, $original = false)
     {
 
-        $query = new SQLProcessor($this);
+        $this->query = new SQLProcessor($this);
 
-        $query->wrapSQL($statement, $options, $sqlOptions);
-        $query->runQuery();
+        $this->query->wrapSQL($statement, $options, $sqlOptions);
+        $this->query->runQuery($original);
 
-        if ($results) {
-            switch (strtolower($results)) {
-                case 'json':
-                    return $query->getJson();
-                    break;
-                case 'xmlobject':
-                    return $query->getXMLObject();
-                    break;
-                case 'rawoutput':
-                default:
-                    return $query->getRawOutput();
-                    break;
-            }
-        } else {
-            return;
-        }
     }
 
     /*
@@ -148,4 +136,181 @@ class PTHToolkit extends Toolkit
 
         return $outputXml;
     }
+
+
+    /*
+    * @MSI Overloading CLCommand to enable a single XML call
+    */
+    /**
+     * @param array $command
+     * @param string $exec
+     * @param bool $original
+     * @return array|bool|void
+     * @throws \Exception
+     */
+    public function CLCommand($command, $exec = '', $original = false)
+    {
+        $this->XMLWrapperPTH = new PTHToolkitServiceXML(array('encoding' => $this->getOption('encoding')), $this);
+
+        $this->cpfErr = '0';
+        $this->error = '';
+        $this->errorText = '';
+
+        $inputXml = $this->XMLWrapperPTH->buildCommandXmlIn($command, $exec);
+
+        // rexx and pase are the ways we might get data back.
+        $expectDataOutput = in_array($exec, array('rexx', 'pase', 'pasecmd'));
+
+        // if a PASE command is to be run, the tag will be 'sh'. Otherwise, 'cmd'.
+        if ($exec == 'pase' || $exec == 'pasecmd') {
+            $parentTag = 'sh';
+        } else {
+            $parentTag = 'cmd';
+        }
+
+        $this->VerifyPLUGName();
+
+        if ($original == false){
+            //append xml
+            $this->appendCallXML($inputXml, false);
+        }else{
+            $this->appendCallXML($inputXml, false);
+            $this->fullXML .= "</script>";
+            // send single xml (original toolkit)
+            $outputXml = $this->sendXml($this->fullXML, false);
+
+            // get status: error or success, with a real CPF error message, and set the error code/msg.
+            $successFlag = $this->XMLWrapper->getCmdResultFromXml($outputXml, $parentTag);
+
+            if ($successFlag) {
+                $this->cpfErr = '0';
+                $this->error = '';
+            } else {
+                $this->cpfErr = $this->XMLWrapper->getErrorCode();
+                $this->error = $this->cpfErr; // ->error is ambiguous. Include for backward compat.
+                $this->errorText = $this->XMLWrapper->getErrorMsg();
+            }
+
+            if ($successFlag && $expectDataOutput) {
+                // if we expect to receive data, extract it from the XML and return it.
+                $outputParamArray = $this->XMLWrapper->getRowsFromXml($outputXml, $parentTag);
+
+                unset($this->XMLWrapper);
+                return $outputParamArray;
+            } else {
+                // don't expect data. Return true/false (success);
+                unset($this->XMLWrapper);
+                return $successFlag;
+            }
+        }
+    }
+
+    /*
+    * @MSI Overloading pgmCall to enable a single XML call
+    */
+    /**
+     * pgmCall
+     *
+     * @param string $pgmName Name of program to call, without library
+     * @param string $lib Library of program. Leave blank to use library list or current library
+     * @param null $inputParam An array of ProgramParameter objects OR XML representing params, to be sent as-is.
+     * @param null $returnParam ReturnValue Array of one parameter that's the return value parameter
+     * @param null $options Array of other options. The most popular is 'func' indicating the name of a subprocedure or function.
+     * @param bool $original
+     * @return void
+     * @throws \Exception
+     */
+    public function pgmCall($pgmName, $lib, $inputParam = NULL, $returnParam = NULL, $options = NULL, $original = false)
+    {
+        $this->cpfErr = '';
+        $this->error = '';
+        $this->joblog = '';
+        $function = NULL;
+
+        ProgramParameter::initializeFallbackVarName();
+
+        // If only one 'return' param, turn it into an array for later processing.
+        if ($returnParam instanceof ProgramParameter) {
+            $returnParam = array($returnParam);
+        }
+
+        $this->XMLWrapperPTH = new PTHToolkitServiceXML(array('encoding' => $this->getOption('encoding')), $this);
+
+        $outputParamArray = false;
+
+        if (isset($options['func'])) {
+            $function = $options['func'];
+        }
+
+        $inputXml = $this->XMLWrapperPTH->buildXmlIn($inputParam, $returnParam, $pgmName, $lib, $function);
+
+        if ($original == false){
+            //append xml
+            $this->appendCallXML($inputXml, false);
+        }else{
+            $this->appendCallXML($inputXml, false);
+            $this->fullXML .= "</script>";
+            // send single xml (original toolkit)
+            $outputXml = $this->sendXml($this->fullXML, false);
+
+            if ($outputXml != '') {
+
+                $outputParamArray = $this->XMLWrapper->getParamsFromXml($outputXml);
+
+                // didn't get expected return, search logs to find out why
+                if (!is_array($outputParamArray)) {
+                    // No real data. Look for errors. Retrieve details from joblog.
+                    $this->joblog = $this->XMLWrapper->getLastJoblog();
+
+                    // standard list of programs that provide CPF codes in joblog
+                    $programsToLookFor = array($pgmName, '< lveContext', '#mnrnrl', 'QRNXIE', '< allProgram');
+
+                    if (isset($this->_cpfMapping[$pgmName])) {
+                        // list of other programs not called directly that might generate CPF codes in joblog.
+                        $programsToLookFor = array_merge($programsToLookFor, $this->_cpfMapping[$pgmName]);
+                    }
+
+                    // put values in $this->cpfErr and $this->error
+                    $this->extractErrorFromJoblog($programsToLookFor);
+                }
+            }
+            return $outputParamArray;
+        }
+        unset ($this->XMLWrapper);
+    }
+
+    /**
+     * @param $inputXml
+     * @param false $disconnect
+     */
+    public function appendCallXML($inputXml, $disconnect=false){
+        $this->fullXML .= $inputXml;
+        $this->disconnect = $disconnect;
+    }
+
+    /**
+     * @param false $results
+     * @return array
+     */
+    public function sendFullXML($results = false){
+        $this->fullXML .= "</script>";
+        $rawOutput = $this->sendXml($this->fullXML, null);
+        if ($results) {
+            switch (strtolower($results)) {
+                case 'json':
+                    return $this->query->getJson($rawOutput);
+                    break;
+                case 'xmlobject':
+                    return $this->query->getXMLObject($rawOutput);
+                    break;
+                case 'rawoutput':
+                default:
+                    return $this->query->getRawOutput($rawOutput);
+                    break;
+            }
+        } else {
+            return [];
+        }
+    }
+
 }
