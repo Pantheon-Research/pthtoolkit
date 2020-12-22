@@ -6,6 +6,7 @@ namespace PTHToolkit;
 //require_once 'vendor/autoload.php';
 require_once 'SQLProcessor.php';
 
+use Exception;
 use PTHToolkit\PTHToolkitServiceXML;
 use ToolkitApi\ProgramParameter;
 use ToolkitApi\Toolkit;
@@ -17,6 +18,7 @@ class PTHToolkit extends Toolkit
     protected $fullXML = "<script>";
     protected $disconnect = null;
     protected $query = null;
+    private \PTHToolkit\PTHToolkitServiceXML $XMLWrapperPTH;
 
     public function __construct($databaseNameOrResource = false, $userOrI5NamingFlag = false, $password = false, $transportType = false, $isPersistent = false)
     {
@@ -294,22 +296,36 @@ class PTHToolkit extends Toolkit
      */
     public function sendFullXML($results = false){
         $this->fullXML .= "</script>";
-        $rawOutput = $this->sendXml($this->fullXML, null);
-        if ($results) {
+        $outputXml = $this->sendXml($this->fullXML, null);
+        // get status: error or success, with a real CPF error message, and set the error code/msg.
+        $successFlag = $this->XMLWrapperPTH->getResultFromXML($outputXml);
+
+        if ($successFlag) {
+            $this->cpfErr = '0';
+            $this->error = '';
+        } else {
+            $this->cpfErr = $this->XMLWrapperPTH->getErrorCode();
+            $this->error = $this->cpfErr; // ->error is ambiguous. Include for backward compat.
+            $this->errorText = $this->XMLWrapperPTH->getErrorMsg();
+            throw new Exception($this->cpfErr .': '. $this->errorText);
+        }
+
+        if ($successFlag && $results) {
             switch (strtolower($results)) {
                 case 'json':
-                    return $this->query->getJson($rawOutput);
+                    return $this->query->getJson($outputXml);
                     break;
                 case 'xmlobject':
-                    return $this->query->getXMLObject($rawOutput);
+                    return $this->query->getXMLObject($outputXml);
                     break;
                 case 'rawoutput':
                 default:
-                    return $this->query->getRawOutput($rawOutput);
+                    return $this->query->getRawOutput($outputXml);
                     break;
             }
         } else {
-            return [];
+            // don't expect data. Return true/false (success);
+            return $successFlag;
         }
     }
 
