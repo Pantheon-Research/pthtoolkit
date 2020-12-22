@@ -934,6 +934,30 @@ class PTHToolkitServiceXML
         return $this->addOuterTags($xmlIn);
     }
 
+    public function getResultFromXML($xml) {
+
+        $xmlobj = simplexml_load_string($xml);
+        if (!$xmlobj instanceof \SimpleXMLElement) {
+            /*bad xml returned*/
+            $this->error = "Can't read output xml";
+            error_log($xml, 3, '/tmp/bad.xml');
+
+            return false;
+        }
+
+        if ($xmlobj->xpath("/report/error") == null){
+            return true;
+        } else {
+            $xmlerrmsg = $xmlobj->xpath("/report/error/xmlerrmsg");
+            $this->cpfErr = (string) $xmlerrmsg[1];
+            $xmlhint = $xmlobj->xpath("/report/error/xmlhint");
+            $this->errorText = (string) $xmlhint[1];
+
+            return false;
+        }
+    }
+
+
     /**
      * gets any error code and sets it in toolkit.
      * returns true or false depending on interpretation of status
