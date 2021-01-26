@@ -294,9 +294,18 @@ class PTHToolkit extends Toolkit
      * @param false $results
      * @return array
      */
-    public function sendFullXML($results = false){
+    public function sendFullXML($results = false, $log = false){
         $this->fullXML .= "</script>";
+
+        $t1 = microtime(true);
         $outputXml = $this->sendXml($this->fullXML, null);
+        $t2 = microtime(true);
+
+        if ($log != false){
+            $td = $t2-$t1;
+            file_put_contents("log/".$log."_".date("j.n.Y").'.log', $td. "\n", FILE_APPEND);
+        }
+
         // get status: error or success, with a real CPF error message, and set the error code/msg.
         $successFlag = $this->XMLWrapperPTH->getResultFromXML($outputXml);
 
