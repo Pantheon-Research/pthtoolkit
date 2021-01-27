@@ -15,7 +15,7 @@ use PDO;
 
 class PTHToolkit extends Toolkit
 {
-    protected $fullXML = "<script>";
+    protected $fullXML = "";
     protected $disconnect = null;
     protected $query = null;
     private \PTHToolkit\PTHToolkitServiceXML $XMLWrapperPTH;
@@ -297,10 +297,17 @@ class PTHToolkit extends Toolkit
     public function sendFullXML($results = false, $log = false){
         $this->fullXML .= "</script>";
 
+        if ($this->getOption('sbmjobCommand')) {
+            $sbmJobCommand = $this->getOption('sbmjobCommand');
+            $this->fullXML = "\n<sbmjob>{$sbmJobCommand}</sbmjob>" . $this->fullXML;
+        }
+
+        $this->fullXML = "<script>" . $this->fullXML;
+
         $t1 = microtime(true);
         $outputXml = $this->sendXml($this->fullXML, null);
         $t2 = microtime(true);
-        $this->fullXML = "<script>";
+        $this->fullXML = "";
         if ($log != false){
             $td = $t2-$t1;
             file_put_contents("log/".$log."_".date("j.n.Y").'.log', $td. "\n", FILE_APPEND);
