@@ -207,10 +207,10 @@ class PTHToolkitServiceXML
         //$finalXml .= "\n<script>";
 
         // include override of submit command if specified
-        if ($this->getOption('sbmjobCommand')) {
-            $sbmJobCommand = $this->getOption('sbmjobCommand');
-            $finalXml .= "\n<sbmjob>{$sbmJobCommand}</sbmjob>";
-        }
+//        if ($this->getOption('sbmjobCommand')) {
+//            $sbmJobCommand = $this->getOption('sbmjobCommand');
+//            $finalXml .= "\n<sbmjob>{$sbmJobCommand}</sbmjob>";
+//        }
 
         // inner "meat" of the XML
         $finalXml .= "\n$inputXml";
