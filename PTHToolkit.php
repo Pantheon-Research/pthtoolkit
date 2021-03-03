@@ -8,7 +8,6 @@ require_once 'SQLProcessor.php';
 
 use Exception;
 use PTHToolkit\PTHToolkitServiceXML;
-use stdClass;
 use ToolkitApi\ProgramParameter;
 use ToolkitApi\Toolkit;
 use PTHToolkit\SQLProcessor;
