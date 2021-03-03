@@ -52,9 +52,15 @@ class PTHToolkit extends Toolkit
 
     }
 
+
+    /**
+     * @param $statement
+     * @param bool $fetch
+     * @return string
+     */
     public function directQuery($statement, $fetch = true)
     {
-        $statement = substr($statement, 0, -1);
+        //$statement = substr($statement, 0, -1); // To Fix: Token ; was not valid
 
         $sth = $this->dbconn->prepare($statement);
         $sth->execute();
@@ -64,7 +70,7 @@ class PTHToolkit extends Toolkit
             $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
             return $result[0]['JSONOBJECT'];
         }
-        return null;
+        return '';
     }
 
     /*
