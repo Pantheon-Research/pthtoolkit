@@ -60,19 +60,14 @@ class PTHToolkit extends Toolkit
      */
     public function directQuery($statement, $fetch = true)
     {
-        //$statement = substr($statement, 0, -1); // To Fix: Token ; was not valid
-
-        $sth = $this->dbconn->prepare($statement);
-        $sth->execute();
-
-        /* Fetch all of the remaining rows in the result set */
         if($fetch){
-            $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
+            $result = $this->dbconn->query($statement)->fetchAll(PDO::FETCH_ASSOC);
             return $result[0]['JSONOBJECT'];
         }
+        $this->dbconn->query($statement);
         return '';
     }
-
+    
     /*
      * Add PDO Connection
      */
