@@ -8,6 +8,7 @@ require_once 'SQLProcessor.php';
 
 use Exception;
 use PTHToolkit\PTHToolkitServiceXML;
+use stdClass;
 use ToolkitApi\ProgramParameter;
 use ToolkitApi\Toolkit;
 use PTHToolkit\SQLProcessor;
@@ -18,6 +19,7 @@ class PTHToolkit extends Toolkit
     protected $fullXML = "";
     protected $disconnect = null;
     protected $query = null;
+    protected $dbconn = null;
     private \PTHToolkit\PTHToolkitServiceXML $XMLWrapperPTH;
 
     public function __construct($databaseNameOrResource = false, $userOrI5NamingFlag = false, $password = false, $transportType = false, $isPersistent = false)
@@ -31,10 +33,10 @@ class PTHToolkit extends Toolkit
     {
         // Check for PDO connection
         if (strtolower($transportType) === 'pdo') {
-            $dbconn = $this->pdoConn($databaseNameOrResource, $userOrI5NamingFlag[0], $password, $userOrI5NamingFlag[1]);
+            $this->dbconn = $this->pdoConn($databaseNameOrResource, $userOrI5NamingFlag[0], $password, $userOrI5NamingFlag[1]);
         }
 
-        parent::__construct($dbconn, $userOrI5NamingFlag[1], $password, $transportType, $isPersistent);
+        parent::__construct($this->dbconn, $userOrI5NamingFlag[1], $password, $transportType, $isPersistent);
     }
 
     /*
@@ -48,6 +50,21 @@ class PTHToolkit extends Toolkit
         $this->query->wrapSQL($statement, $options, $sqlOptions);
         $this->query->runQuery($original);
 
+    }
+
+    public function directQuery($statement, $fetch = true)
+    {
+        $statement = substr($statement, 0, -1);
+
+        $sth = $this->dbconn->prepare($statement);
+        $sth->execute();
+
+        /* Fetch all of the remaining rows in the result set */
+        if($fetch){
+            $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
+            return $result[0]['JSONOBJECT'];
+        }
+        return null;
     }
 
     /*
