@@ -2,6 +2,8 @@
 
 namespace PTHToolkit;
 
+use SimpleXMLElement;
+
 class SQLProcessor
 {
     protected $ToolkitServiceObj = null;
@@ -90,7 +92,7 @@ class SQLProcessor
 
     /**
      * @param $rawOutput
-     * @return \SimpleXMLElement
+     * @return SimpleXMLElement
      */
     public function getXMLObject($rawOutput)
     {
@@ -123,6 +125,11 @@ class SQLProcessor
         $columnHeaders = [];
         $i = 0;
 
+        //check if the cursor exits
+
+        if(!isset($cursor)){
+            return []; //nope return empty array
+        }
         foreach ($cursor->row as $row) {
             $rowReturn = [];
 
