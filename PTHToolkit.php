@@ -28,7 +28,7 @@ class PTHToolkit extends Toolkit
     /*
      * Add a connection function
      */
-    public function makeConnection($databaseNameOrResource, $userOrI5NamingFlag = '1', $password = '', $transportType = '', $isPersistent = false)
+    public function makeConnection($databaseNameOrResource, $userOrI5NamingFlag = '0', $password = '', $transportType = '', $isPersistent = false)
     {
         // Check for PDO connection
         if (strtolower($transportType) === 'pdo') {
