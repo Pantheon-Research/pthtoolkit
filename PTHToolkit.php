@@ -28,7 +28,7 @@ class PTHToolkit extends Toolkit
     /*
      * Add a connection function
      */
-    public function makeConnection($databaseNameOrResource, $userOrI5NamingFlag = '0', $password = '', $transportType = '', $isPersistent = false)
+    public function makeConnection($databaseNameOrResource, $userOrI5NamingFlag = '1', $password = '', $transportType = '', $isPersistent = false)
     {
         // Check for PDO connection
         if (strtolower($transportType) === 'pdo') {
@@ -39,7 +39,7 @@ class PTHToolkit extends Toolkit
     }
 
     /*
-     * Add SQL support (straight execute)
+     * Add SQL support in XML
      */
     public function executeSQL($statement, $options = [], $sqlOptions = NULL, $original = false)
     {
@@ -57,16 +57,20 @@ class PTHToolkit extends Toolkit
      * @param bool $fetch
      * @return string
      */
-    public function directQuery($statement, $fetch = true)
+    public function directQuery($statement, $fetch = true, $parms = [])
     {
         if($fetch){
-            $result = $this->dbconn->query($statement)->fetchAll(PDO::FETCH_ASSOC);
+            $sql = $this->dbconn->prepare($statement); // Prevent sql injection
+            $sql->execute($parms);
+            $result = $sql->fetchAll();
             return $result[0]['JSONOBJECT'];
+
         }
-        $this->dbconn->query($statement);
+        $sql = $this->dbconn->prepare($statement); // Prevent sql injection
+        $sql->execute($parms);
         return '';
     }
-    
+
     /*
      * Add PDO Connection
      */
