@@ -63,7 +63,7 @@ class PTHToolkit extends Toolkit
             $sql = $this->dbconn->prepare($statement); // Prevent sql injection
             $sql->execute($parms);
             $result = $sql->fetchAll();
-            return $result[0]['JSONOBJECT'];
+            return $result[0][0];
 
         }
         $sql = $this->dbconn->prepare($statement); // Prevent sql injection
