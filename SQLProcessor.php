@@ -123,6 +123,11 @@ class SQLProcessor
         $columnHeaders = [];
         $i = 0;
 
+        //do we have a cursor?
+        if(!isset($cursor) || !isset($cursor->row)){
+            return $result;
+        }
+
         foreach ($cursor->row as $row) {
             $rowReturn = [];
 
