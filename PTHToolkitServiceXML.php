@@ -366,7 +366,8 @@ class PTHToolkitServiceXML
      * @param null $function
      * @return string
      */
-    public function buildXmlIn($pgm, $inputOutputParams = NULL, array $returnParams = NULL,
+    public function buildXmlIn($inputOutputParams = NULL, array $returnParams = NULL,
+                               $pgm = NULL,
                                $lib = "",
                                $function = NULL)
     {
